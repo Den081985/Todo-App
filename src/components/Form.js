@@ -7,7 +7,7 @@ function Form(props) {
   function handleChange(e) {
     setName(e.target.value);
   }
-  //функция handleSubmit сробатывает при отправке формы
+  //функция handleSubmit срабатывает при отправке формы
   function handleSubmit(e) {
     if (name === "") {
       e.preventDefault();
