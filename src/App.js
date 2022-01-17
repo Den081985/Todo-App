@@ -1,10 +1,11 @@
 // import logo from "./logo.svg";
 // import "./App.css";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { nanoid } from "nanoid";
 import Todo from "./components/Todo";
 import Form from "./components/Form";
 import FilterButton from "./components/FIlterButton";
+import { usePrevious } from "./components/utils";
 /*Объект для связи имен фильтров с поведением
 Значения FILTER_MAP-это функции, которые мы будем использовать для фильтрации tasks массива данных:
 В All фильтре показывает все задачи, поэтому мы возвращаем true для всех задач,
@@ -84,13 +85,27 @@ function App(props) {
   //headingText - для отображения актуального количества задач
   const taskNoun = taskList.length !== 1 ? "tasks" : "task";
   const headingText = `${taskList.length} ${taskNoun} remaining`;
+  //хук,фиксирующий ссылку на заголовок списка
+  const listHeadingRef = useRef(null);
+  // вызываем usePrevious()для отслеживания длины состояния задач
+  const prevTaskLength = usePrevious(tasks.length);
+  /*useEffect()хук для запуска при изменении нашего количества задач, который будет фокусировать 
+заголовок, если количество задач, которые у нас есть сейчас, меньше, чем было раньше, т.е. 
+мы удалили задачу!*/
+  useEffect(() => {
+    if (tasks.length - prevTaskLength === -1) {
+      listHeadingRef.current.focus();
+    }
+  }, [tasks.length, prevTaskLength]);
 
   return (
     <div className="todoapp stack-large">
       <h1>TodoMatic</h1>
       <Form addTask={addTask} />
       <div className="filters btn-group stack-exception">{filterList}</div>
-      <h2 id="list-heading">{headingText}</h2>
+      <h2 id="list-heading" tabIndex={"-1"} ref={listHeadingRef}>
+        {headingText}
+      </h2>
       <ul
         role="list"
         className="todo-list stack-large stack-exception"
